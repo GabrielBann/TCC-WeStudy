@@ -1,8 +1,18 @@
-const express = require('express')
-const path = require('path')
+import express from 'express'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import usuarioRoutes from './routes/usuarioRoutes.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
-app.use(express.urlencoded({extended:true}))
+
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-module.exports = app
+app.use(express.static(path.join(__dirname, '../dist')))
+
+app.use('/usuario', usuarioRoutes)
+
+export default app

@@ -1,4 +1,4 @@
-const connection = require('../database/connection')
+import connection from '../database/connection.js'
 
 async function Logar(email, senha) {
     const [rows] = await connection.query('CALL login_usuario(?,?)', [email, senha])
@@ -18,7 +18,7 @@ async function Excluir(email,senha) {
     return result
 } 
 
-module.exports = {
+export default {
     Logar,
     Cadastrar,
     Editar,
