@@ -19,9 +19,48 @@ import { useNavigate } from "react-router-dom";
 //     )
 // }
 
-import "./Inicio.css";
+
+{/* <section>
+    <input type="text" id="email" placeholder="Email" value={email} onChange={emailChange}/>
+    <input type="password" id="password" placeholder="Senha" value={senha} onChange={senhaChange}/>
+    <button onClick={Logar}>Logar</button>
+</section> */}
+
+//  <section>
+//     <input type="text" id="email" placeholder="Email" value={email} onChange={emailChange}/>
+//     <input type="password" id="password" placeholder="Senha" value={senha} onChange={senhaChange}/>
+//     <input type="text" id="nome" placeholder="Nome" value={nome} onChange={nomeChange}/>
+//     <input type="text" id="tipo" placeholder="Tipo" value={tipo} onChange={tipoChange}/>
+//     <button onClick={Logar}>Cadastrar</button>
+//     {mensagem == "" ? null : <p>{mensagem}</p>}
+// </section>
+
+import Logar from "../../funcoes/Logar";
+import Cadastrar from "../../funcoes/Cadastrar";
+import './index.module.css';
 
 export default function LandingPage() {
+    const [email, setEmail] = useState("");
+    const [senha, setSenha] = useState("");
+    const [nome, setNome] = useState("");
+    const [tipo, setTipo] = useState("");
+    const [mensagem, setMensagem] = useState("");
+
+    function formularioLogin() {
+
+    }
+    function formularioCadastro() {
+
+    }
+
+    function Login(){
+        Logar(email, senha);
+    }
+
+    function Cadastro(){
+        Cadastrar(nome, email, senha, tipo);
+    }
+
     return (
         <div className="landing-page">
 

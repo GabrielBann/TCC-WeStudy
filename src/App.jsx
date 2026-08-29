@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Inicio from "./components/Inicio";
-import Login from "./components/Login";
-import Cadastrar from "./components/Cadastrar";
+import Plataforma from "./components/Plataforma";
+import Opcoes from "./components/Opcoes";
 
 export default function App() {
     
@@ -9,8 +9,12 @@ return (
     <BrowserRouter>
         <Routes>
             <Route path="/" element={<Inicio />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/cadastrar" element={<Cadastrar />} />
+            <Route path="/plataforma" element={<Plataforma />}> 
+                <Route index element={<Opcoes />} />
+                <Route path="/guias" element={<Guias />} />
+                <Route path="/sessoes" element={<Sessoes />} />
+                <Route path="/cadernos" element={<Cadernos />} />
+            </Route>
         </Routes>
     </BrowserRouter>
   )

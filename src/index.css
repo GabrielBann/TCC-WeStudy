@@ -1,111 +1,119 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+* {
+    
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    text-decoration: none;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+    /* CORES */
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    --preto: #040316;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+    --claro-1: #FBFBFE;
+    --claro-2: #EFEFFB;
+    --claro-3: #E2E2F8;
+    --claro-4: #D6D6F5;
+    --claro-5: #CACAF2;
+
+    --cinza-1: #ADADEB;
+    --cinza-2: #9E9EC7;
+    --cinza-3: #8A8AA8;
+    --cinza-4: #73738C;
+    --cinza-5: #5C5C70;
+
+    --primaria-1: #59A694;
+    --primaria-2: #509585;
+    --primaria-3: #478576;
+    --primaria-4: #3E7468;
+    --primaria-5: #2C534A;
+
+    /* TOKENS */
+
+    --texto-claro: var(--claro-1);
+    --texto-escuro: var(--preto);
+
+    --fundo-main: var(--claro-1);
+    --fundo-card: var(--claro-2);
+    --fundo-controle: var(--claro-3);
+
+    --borda-card: var(--cinza-1);
+
+    --radius-button: var(--espaco-5);
+    --radius-input: var(--espaco-4);
+
+    /* ESPAÇAMENTOS */
+
+    --espaco-0: 0px; 
+    --espaco-1: 4px; 
+    --espaco-2: 6px; 
+    --espaco-3: 8px; 
+    --espaco-4: 12px; 
+    --espaco-5: 16px; 
+    --espaco-6: 20px; 
+    --espaco-7: 26px; 
+    --espaco-8: 32px; 
+    --espaco-9: 40px; 
+    --espaco-10: 64px; 
+
+    /* FONTE */
+
+    --heading-typeface: 'League Spartan';
+    --body-typeface: 'Nunito Sans';
+
+    --body-big: 19.2px;
+    --body-main: 16px;
+    --body-small: 13.3px;
+
+    --heading-1: 47.8px;
+    --heading-2: 39.8px;
+    --heading-3: 33.2px;
+    --heading-4: 27.6px;
+    --heading-5: 23px;
+
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+p.big {
+    font-family: var(--body-typeface);
+    font-size: var(--body-big);
 }
 
-body {
-  margin: 0;
+p, a, button {
+    font-family: var(--body-typeface);
+    font-size: var(--body-main);
+    color: var(--texto-escuro)
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+small {
+    font-family: var(--body-typeface);
+    font-size: var(--body-small);
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+    font-family: var(--heading-typeface);
+    font-size: var(--heading-1);
 }
+
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+    font-family: var(--heading-typeface);
+    font-size: var(--heading-2);
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+h3 {
+    font-family: var(--heading-typeface);
+    font-size: var(--heading-3);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+h4 {
+    font-family: var(--heading-typeface);
+    font-size: var(--heading-4);
+}
+
+h5 {
+    font-family: var(--heading-typeface);
+    font-size: var(--heading-5);
+}
+
+.icone {
+    width: 24px;
+    height: 24px;
 }
