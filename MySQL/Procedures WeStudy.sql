@@ -1,5 +1,53 @@
 DELIMITER $$
 
+DROP PROCEDURE IF EXISTS login_usuario$$
+CREATE PROCEDURE login_usuario(
+    pEmail VARCHAR(100),
+    pSenha VARCHAR(64)
+)
+BEGIN
+
+    DECLARE qtd INT DEFAULT 0;
+
+    SELECT COUNT(*)
+    INTO qtd
+    FROM Usuario
+    WHERE email = pEmail;
+
+    IF (qtd = 0) THEN
+
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Email não cadastrado';
+
+    ELSE
+
+        SELECT COUNT(*)
+        INTO qtd
+        FROM Usuario
+        WHERE email = pEmail
+        AND senha = pSenha;
+
+        IF (qtd = 0) THEN
+
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Senha incorreta';
+
+        ELSE
+
+            SELECT
+                email,
+                nome,
+                tipo,
+                ranking,
+                desconto
+            FROM Usuario
+            WHERE email = pEmail;
+
+        END IF;
+
+    END IF;
+
+END $$
 
 DROP PROCEDURE IF EXISTS cadastrar_usuario$$
 CREATE PROCEDURE cadastrar_usuario(

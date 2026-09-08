@@ -2,6 +2,11 @@ DROP SCHEMA IF EXISTS WeStudy;
 CREATE SCHEMA WeStudy;
 USE WeStudy;
 
+CREATE TABLE Materia(
+cd_materia INT NOT NULL,
+nm_materia VARCHAR(64) NOT NULL,
+CONSTRAINT pk_materia PRIMARY KEY (cd_materia)
+);
 
 CREATE TABLE Usuario (
     email VARCHAR(100) NOT NULL,

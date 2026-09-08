@@ -54,21 +54,24 @@ main nav {
 }
 
 .card-link {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-
     background-color: var(--primaria-1);
     padding: var(--espaco-7);
     position: relative;
     text-align: center;
+    border:none;
     border-radius: var(--espaco-5);
 
 }
 
 .card-link:hover {
-    border: 2px solid var(--primaria-3)
+    outline: 2px solid var(--primaria-3);
+    border: none;
 }
 
 .card-link p, h4 {

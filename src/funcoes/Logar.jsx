@@ -1,40 +1,30 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-export default function Logar(email, senha){
+export default async function Logar(vEmail, vSenha, navigate) {
+    try {
+        const resposta = await axios.post(
+            "http://localhost:3000/usuario/logar",
+            {
+                email: vEmail,
+                senha: vSenha
+            }
+        );
 
-    const navigate = useNavigate();
+        if (resposta.data && resposta.data.mensagem) {
+            return { mensagem: resposta.data.mensagem };
+        }
 
-    const vEmail = email.trim();
-    const vSenha = senha.trim();
-
-    if(vEmail === ""){
-        setMensagem("Informe seu e-mail");
-        setTimeout(() => {
-            setMensagem("");
-        }, 3000);
-        return;
-    }
-    if(vSenha === ""){
-        setMensagem("Informe sua senha");
-        setTimeout(() => {
-            setMensagem("");
-        }, 3000);
-        return;
-    }
-    axios.post("http://localhost:3000/usuario/logar", 
-    {
-        "email": vEmail,
-        "senha": vSenha
-    },
-    ).then(function (resposta) {
         console.log(resposta);
         console.log(resposta.data);
-        console.log("Logadoooo")
-        navigate('/plataforma');
-    })
-    .catch(function (error) {
+        console.log("Logadoooo");
+
+        navigate("/plataforma");
+
+        return null;
+
+    } catch (error) {
         console.warn(error);
-    })
-    .finally(function () {});
+
+        return {mensagem: "Erro ao logar o usuário"};
+    }
 }

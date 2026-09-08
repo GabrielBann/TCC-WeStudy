@@ -7,7 +7,7 @@ async function logar(req, res) {
         return res.json(user)
     }
     catch (error){
-        return res.status(500).json({ error: 'Erro ao logar o usuário' })
+        return res.status(500).json(user)
     }
 }
 

@@ -1,64 +1,22 @@
-import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import LoginPopup from "../LoginPopup";
+import CadastroPopup from "../CadastroPopup";
+import GuideCard from "../GuideCard";
+import MiniGuideCard from "../MineGuideCard";
+import Logotipo from "../../assets/Logotipo WeStudy.png";
 
-// export default function Inicio(){
-//     const navigate = useNavigate();
-
-//     function Login(){
-//         navigate('/login')
-//     }
-//     function Cadastrar(){
-//         navigate('/cadastrar')
-//     }
-//     return(
-//         <section>
-//             <button onClick={Login}>Login</button>
-//             <button onClick={Cadastrar}>Cadastrar</button>
-//         </section>
-//     )
-// }
-
-
-{/* <section>
-    <input type="text" id="email" placeholder="Email" value={email} onChange={emailChange}/>
-    <input type="password" id="password" placeholder="Senha" value={senha} onChange={senhaChange}/>
-    <button onClick={Logar}>Logar</button>
-</section> */}
-
-//  <section>
-//     <input type="text" id="email" placeholder="Email" value={email} onChange={emailChange}/>
-//     <input type="password" id="password" placeholder="Senha" value={senha} onChange={senhaChange}/>
-//     <input type="text" id="nome" placeholder="Nome" value={nome} onChange={nomeChange}/>
-//     <input type="text" id="tipo" placeholder="Tipo" value={tipo} onChange={tipoChange}/>
-//     <button onClick={Logar}>Cadastrar</button>
-//     {mensagem == "" ? null : <p>{mensagem}</p>}
-// </section>
-
-import Logar from "../../funcoes/Logar";
-import Cadastrar from "../../funcoes/Cadastrar";
-import './index.module.css';
+import './index.css';
 
 export default function LandingPage() {
-    const [email, setEmail] = useState("");
-    const [senha, setSenha] = useState("");
-    const [nome, setNome] = useState("");
-    const [tipo, setTipo] = useState("");
-    const [mensagem, setMensagem] = useState("");
+    const [loginAberto, setLoginAberto] = useState(false);
+    const [cadastroAberto, setCadastroAberto] = useState(false);
 
     function formularioLogin() {
-
+        setLoginAberto(!loginAberto);
     }
+
     function formularioCadastro() {
-
-    }
-
-    function Login(){
-        Logar(email, senha);
-    }
-
-    function Cadastro(){
-        Cadastrar(nome, email, senha, tipo);
+        setCadastroAberto(!cadastroAberto);
     }
 
     return (
@@ -66,17 +24,16 @@ export default function LandingPage() {
 
             <header className="navbar">
                 <a href="/" className="logo">
-                    <img src="/assets/logo.png" alt="WeStudy" />
+                    <img src={Logotipo} alt="WeStudy" />
                 </a>
 
                 <nav className="nav-links">
-                    <a href="#guias">Guias</a>
-                    <a href="#sessoes">Sessões de Estudo</a>
-                    <a href="/cadastro" className="btn-cadastro">Cadastro</a>
-                    <a href="/login" className="btn-login">↪ Login</a>
+                    <a href="#">Guias</a>
+                    <a href="#">Sessões</a>
+                    <a href="#">Cadernos</a>
+                    <button onClick={formularioCadastro} className="btn-cadastro">Cadastro </button>
+                    <button onClick={formularioLogin} className="btn-login"> ↪ Login </button>
                 </nav>
-
-                <button className="menu-button">☰</button>
             </header>
 
             <section className="hero">
@@ -90,11 +47,11 @@ Aqui você forma grupos de estudos baseados em tópicos específicos e interagem
                         <h4>Junte-se a nós!</h4>
 
                         <div className="hero-buttons">
-                            <a href="/cadastro" className="btn-secondary">
+                            <a onClick={formularioCadastro} className="btn-secondary">
                                 <p>Criar a sua conta</p>
                             </a>
 
-                            <a href="/login" className="btn-secondary">
+                            <a onClick={formularioLogin} className="btn-secondary">
                                 <p>Entrar na sua conta</p>
                             </a>
                         </div>
@@ -364,19 +321,19 @@ Aqui você forma grupos de estudos baseados em tópicos específicos e interagem
                 <h3>WeStudy</h3>
  
                 <div className="hero-buttons">
-                    <a href="/cadastro" className="btn-primary">
-                        <p>Criar a sua conta</p>
+                    <a onClick={formularioCadastro} className="btn-primary">
+                        Criar a sua conta
                     </a>
  
-                    <a href="/login" className="btn-secondary">
-                        <p>Entrar na sua conta</p>
+                    <a onClick={formularioLogin} className="btn-secondary">
+                        Entrar na sua conta
                     </a>
                 </div>
             </section>
  
             <footer className="footer">
                 <a href="/" className="footer-logo">
-                    <img src="/assets/logo.png" alt="WeStudy" />
+                    <img src={Logotipo} alt="WeStudy" />
                 </a>
  
                 <div className="footer-links">
@@ -401,62 +358,8 @@ Aqui você forma grupos de estudos baseados em tópicos específicos e interagem
                 </div>
             </footer>
 
-        </div>
-    );
-}
-
-function GuideCard() {
-    return (
-        <div className="guide-card">
-
-            <div className="guide-top">
-                <p>Aline</p>
-                <p>Criado em 27/07/2026</p>
-            </div>
-
-            <p className="guide-price">
-                R$5,00
-            </p>
-
-            <h4>
-                Fórmulas Aritméticas
-            </h4>
-
-            <div className="guide-rating">
-                <p>
-                    3,5 ★★★★☆
-                </p>
-
-                <p className="rating-count">
-                    10+ Avaliações
-                </p>
-            </div>
-
-            <button>
-                <p>Ver mais</p>
-            </button>
-
-        </div>
-    );
-}
-
-function MiniGuideCard() {
-    return (
-        <div className="mini-guide">
-
-            <div className="mini-guide-top">
-                <p>Aline</p>
-                <p>Criado em 27/07/2026</p>
-            </div>
-
-            <h4>
-                Fórmulas Aritméticas
-            </h4>
-
-            <button>
-                <p>Importar</p>
-            </button>
-
+            { loginAberto && <LoginPopup onClose={formularioLogin} /> }
+            { cadastroAberto && <CadastroPopup onClose={formularioCadastro} /> }
         </div>
     );
 }

@@ -1,3 +1,20 @@
+INSERT INTO Materia (
+    cd_materia,
+    nm_materia
+) VALUES
+(1, 'Matemática'),
+(2, 'Português'),
+(3, 'Geografia'),
+(4, 'História'),
+(5, 'Física'),
+(6, 'Química'),
+(7, 'Inglês'),
+(8, 'Filosofia'),
+(9, 'Sociologia'),
+(10, 'Espanhol'),
+(11, 'Biologia'),
+(12, 'Informática');
+
 INSERT INTO Usuario (
     email,
     ranking,

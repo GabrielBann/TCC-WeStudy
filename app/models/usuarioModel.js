@@ -1,8 +1,14 @@
 import connection from '../database/connection.js'
 
 async function Logar(email, senha) {
-    const [rows] = await connection.query('CALL login_usuario(?,?)', [email, senha])
-    return rows
+    try {
+        const [rows] = await connection.query('CALL login_usuario(?, ?)',[email, senha]);
+
+        return rows;
+    } catch (error) {
+        console.log(error);
+        return {"mensagem": error.sqlMessage};
+    }
 } 
 
 async function Cadastrar(email,senha,nome,tipo) {
