@@ -935,47 +935,9 @@ BEGIN
 END $$
 
 
-DROP PROCEDURE IF EXISTS publicar_caderno$$
-CREATE PROCEDURE publicar_caderno(
-    pCd_caderno INT
-)
-BEGIN
-    DECLARE qtd INT DEFAULT 0;
-    DECLARE codigo INT DEFAULT 0;
-
-    SELECT COUNT(*) INTO qtd
-    FROM Caderno_aluno
-    WHERE cd_caderno = pCd_caderno
-    AND cd_publicacao IS NULL;
-
-    IF qtd = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Caderno não encontrado ou já publicado';
-    ELSE
-        SELECT IFNULL(MAX(cd_publicacao) + 1, 1)
-        INTO codigo
-        FROM Caderno_publicado;
-
-        INSERT INTO Caderno_publicado (
-            cd_publicacao,
-            data_publicacao,
-            qt_acessos
-        )
-        VALUES (
-            codigo,
-            CURDATE(),
-            0
-        );
-
-        UPDATE Caderno_aluno
-        SET cd_publicacao = codigo
-        WHERE cd_caderno = pCd_caderno;
-    END IF;
-END $$
-
-
 DROP PROCEDURE IF EXISTS cadastrar_caderno$$
 CREATE PROCEDURE cadastrar_caderno(
+    pEmail VARCHAR(100),
     pCd_guia INT,
     pTexto LONGTEXT,
     pDisciplina TINYTEXT,
@@ -985,42 +947,58 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    IF pCd_guia IS NOT NULL THEN
-        SELECT COUNT(*) INTO qtd
-        FROM Guia
-        WHERE cd_guia = pCd_guia;
+    SELECT COUNT(*) INTO qtd
+    FROM Usuario
+    WHERE email = pEmail;
 
-        IF qtd = 0 THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Guia não encontrado';
+    IF qtd = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Usuário não encontrado';
+    ELSE
+
+        IF pCd_guia IS NOT NULL THEN
+
+            SELECT COUNT(*) INTO qtd
+            FROM Guia
+            WHERE cd_guia = pCd_guia;
+
+            IF qtd = 0 THEN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Guia não encontrado';
+            END IF;
+
         END IF;
+
+        SELECT IFNULL(MAX(cd_caderno) + 1, 1)
+        INTO codigo
+        FROM Caderno_aluno;
+
+        INSERT INTO Caderno_aluno (
+            cd_caderno,
+            usuario_email,
+            cd_guia,
+            cd_publicacao,
+            texto,
+            disciplina,
+            topico
+        )
+        VALUES (
+            codigo,
+            pEmail,
+            pCd_guia,
+            NULL,
+            pTexto,
+            pDisciplina,
+            pTopico
+        );
+
     END IF;
-
-    SELECT IFNULL(MAX(cd_caderno) + 1, 1)
-    INTO codigo
-    FROM Caderno_aluno;
-
-    INSERT INTO Caderno_aluno (
-        cd_caderno,
-        cd_guia,
-        cd_publicacao,
-        texto,
-        disciplina,
-        topico
-    )
-    VALUES (
-        codigo,
-        pCd_guia,
-        NULL,
-        pTexto,
-        pDisciplina,
-        pTopico
-    );
 END $$
 
 
 DROP PROCEDURE IF EXISTS atualizar_caderno$$
 CREATE PROCEDURE atualizar_caderno(
+    pEmail VARCHAR(100),
     pCd_caderno INT,
     pTexto LONGTEXT,
     pDisciplina TINYTEXT,
@@ -1031,17 +1009,21 @@ BEGIN
 
     SELECT COUNT(*) INTO qtd
     FROM Caderno_aluno
-    WHERE cd_caderno = pCd_caderno;
+    WHERE cd_caderno = pCd_caderno
+    AND usuario_email = pEmail;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Caderno não encontrado';
+        SET MESSAGE_TEXT = 'Caderno não encontrado ou não pertence ao usuário';
     ELSE
+
         UPDATE Caderno_aluno
         SET texto = pTexto,
             disciplina = pDisciplina,
             topico = pTopico
-        WHERE cd_caderno = pCd_caderno;
+        WHERE cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
+
     END IF;
 END $$
 
@@ -1061,15 +1043,43 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Caderno não encontrado';
     ELSE
-        SELECT *
+
+        SELECT
+            cd_caderno,
+            usuario_email,
+            cd_guia,
+            cd_publicacao,
+            texto,
+            disciplina,
+            topico
         FROM Caderno_aluno
         WHERE cd_caderno = pCd_caderno;
+
     END IF;
+END $$
+
+$$
+CREATE PROCEDURE buscar_cadernos_usuario(
+    pEmail VARCHAR(100)
+)
+BEGIN
+
+    SELECT
+        cd_caderno,
+        cd_guia,
+        cd_publicacao,
+        texto,
+        disciplina,
+        topico
+    FROM Caderno_aluno
+    WHERE usuario_email = pEmail;
+
 END $$
 
 
 DROP PROCEDURE IF EXISTS excluir_caderno$$
 CREATE PROCEDURE excluir_caderno(
+    pEmail VARCHAR(100),
     pCd_caderno INT
 )
 BEGIN
@@ -1077,17 +1087,278 @@ BEGIN
 
     SELECT COUNT(*) INTO qtd
     FROM Caderno_aluno
-    WHERE cd_caderno = pCd_caderno;
+    WHERE cd_caderno = pCd_caderno
+    AND usuario_email = pEmail;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Caderno não encontrado';
+        SET MESSAGE_TEXT = 'Caderno não encontrado ou não pertence ao usuário';
     ELSE
+
         DELETE FROM Caderno_aluno
-        WHERE cd_caderno = pCd_caderno;
+        WHERE cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
+
     END IF;
 END $$
 
+
+DROP PROCEDURE IF EXISTS publicar_caderno$$
+CREATE PROCEDURE publicar_caderno(
+    pEmail VARCHAR(100),
+    pCd_caderno INT
+)
+BEGIN
+    DECLARE qtd INT DEFAULT 0;
+    DECLARE codigo INT DEFAULT 0;
+
+    SELECT COUNT(*) INTO qtd
+    FROM Caderno_aluno
+    WHERE cd_caderno = pCd_caderno
+    AND usuario_email = pEmail
+    AND cd_publicacao IS NULL;
+
+    IF qtd = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Caderno não encontrado, não pertence ao usuário ou já foi publicado';
+    ELSE
+
+        SELECT IFNULL(MAX(cd_publicacao) + 1, 1)
+        INTO codigo
+        FROM Caderno_publicado;
+
+        INSERT INTO Caderno_publicado (
+            cd_publicacao,
+            data_publicacao,
+            qt_acessos
+        )
+        VALUES (
+            codigo,
+            CURDATE(),
+            0
+        );
+
+        UPDATE Caderno_aluno
+        SET cd_publicacao = codigo
+        WHERE cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
+
+    END IF;
+END $$
+
+
+DROP PROCEDURE IF EXISTS remover_publicacao_caderno$$
+CREATE PROCEDURE remover_publicacao_caderno(
+    pEmail VARCHAR(100),
+    pCd_caderno INT
+)
+BEGIN
+    DECLARE qtd INT DEFAULT 0;
+    DECLARE codigo INT DEFAULT 0;
+
+    SELECT COUNT(*) INTO qtd
+    FROM Caderno_aluno
+    WHERE cd_caderno = pCd_caderno
+    AND usuario_email = pEmail
+    AND cd_publicacao IS NOT NULL;
+
+    IF qtd = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Caderno não encontrado, não pertence ao usuário ou não está publicado';
+    ELSE
+
+        SELECT cd_publicacao
+        INTO codigo
+        FROM Caderno_aluno
+        WHERE cd_caderno = pCd_caderno;
+
+        UPDATE Caderno_aluno
+        SET cd_publicacao = NULL
+        WHERE cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
+
+        DELETE FROM Caderno_publicado
+        WHERE cd_publicacao = codigo;
+
+    END IF;
+END $$
+
+
+DROP PROCEDURE IF EXISTS consultar_cadernos_publicados$$
+CREATE PROCEDURE consultar_cadernos_publicados()
+BEGIN
+
+    SELECT
+        C.cd_caderno,
+        C.usuario_email,
+        C.cd_guia,
+        C.texto,
+        C.disciplina,
+        C.topico,
+        P.cd_publicacao,
+        P.data_publicacao,
+        P.qt_acessos
+    FROM Caderno_aluno C
+    INNER JOIN Caderno_publicado P
+        ON C.cd_publicacao = P.cd_publicacao;
+
+END $$
+
+
+DROP PROCEDURE IF EXISTS consultar_caderno_publicado$$
+CREATE PROCEDURE consultar_caderno_publicado(
+    pCd_caderno INT
+)
+BEGIN
+    DECLARE qtd INT DEFAULT 0;
+
+    SELECT COUNT(*) INTO qtd
+    FROM Caderno_aluno C
+    INNER JOIN Caderno_publicado P
+        ON C.cd_publicacao = P.cd_publicacao
+    WHERE C.cd_caderno = pCd_caderno;
+
+    IF qtd = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Caderno não encontrado ou não está publicado';
+    ELSE
+
+        SELECT
+            C.cd_caderno,
+            C.usuario_email,
+            C.cd_guia,
+            C.texto,
+            C.disciplina,
+            C.topico,
+            P.cd_publicacao,
+            P.data_publicacao,
+            P.qt_acessos
+        FROM Caderno_aluno C
+        INNER JOIN Caderno_publicado P
+            ON C.cd_publicacao = P.cd_publicacao
+        WHERE C.cd_caderno = pCd_caderno;
+
+    END IF;
+END $$
+
+
+DROP PROCEDURE IF EXISTS acessar_caderno_publicado$$
+CREATE PROCEDURE acessar_caderno_publicado(
+    pCd_caderno INT
+)
+BEGIN
+    DECLARE qtd INT DEFAULT 0;
+    DECLARE codigo INT DEFAULT 0;
+
+    SELECT COUNT(*) INTO qtd
+    FROM Caderno_aluno C
+    INNER JOIN Caderno_publicado P
+        ON C.cd_publicacao = P.cd_publicacao
+    WHERE C.cd_caderno = pCd_caderno;
+
+    IF qtd = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Caderno não encontrado ou não está publicado';
+    ELSE
+
+        SELECT cd_publicacao
+        INTO codigo
+        FROM Caderno_aluno
+        WHERE cd_caderno = pCd_caderno;
+
+        UPDATE Caderno_publicado
+        SET qt_acessos = qt_acessos + 1
+        WHERE cd_publicacao = codigo;
+
+        SELECT
+            C.cd_caderno,
+            C.usuario_email,
+            C.cd_guia,
+            C.texto,
+            C.disciplina,
+            C.topico,
+            P.cd_publicacao,
+            P.data_publicacao,
+            P.qt_acessos
+        FROM Caderno_aluno C
+        INNER JOIN Caderno_publicado P
+            ON C.cd_publicacao = P.cd_publicacao
+        WHERE C.cd_caderno = pCd_caderno;
+
+    END IF;
+END $$
+
+
+DROP PROCEDURE IF EXISTS consultar_cadernos_publicados_disciplina$$
+CREATE PROCEDURE consultar_cadernos_publicados_disciplina(
+    pDisciplina TINYTEXT
+)
+BEGIN
+
+    SELECT
+        C.cd_caderno,
+        C.usuario_email,
+        C.cd_guia,
+        C.texto,
+        C.disciplina,
+        C.topico,
+        P.cd_publicacao,
+        P.data_publicacao,
+        P.qt_acessos
+    FROM Caderno_aluno C
+    INNER JOIN Caderno_publicado P
+        ON C.cd_publicacao = P.cd_publicacao
+    WHERE C.disciplina = pDisciplina;
+
+END $$
+
+
+DROP PROCEDURE IF EXISTS consultar_cadernos_publicados_topico$$
+CREATE PROCEDURE consultar_cadernos_publicados_topico(
+    pTopico TINYTEXT
+)
+BEGIN
+
+    SELECT
+        C.cd_caderno,
+        C.usuario_email,
+        C.cd_guia,
+        C.texto,
+        C.disciplina,
+        C.topico,
+        P.cd_publicacao,
+        P.data_publicacao,
+        P.qt_acessos
+    FROM Caderno_aluno C
+    INNER JOIN Caderno_publicado P
+        ON C.cd_publicacao = P.cd_publicacao
+    WHERE C.topico = pTopico;
+
+END $$
+
+
+DROP PROCEDURE IF EXISTS atualizar_acessos_caderno$$
+CREATE PROCEDURE atualizar_acessos_caderno(
+    pCd_publicacao INT
+)
+BEGIN
+    DECLARE qtd INT DEFAULT 0;
+
+    SELECT COUNT(*) INTO qtd
+    FROM Caderno_publicado
+    WHERE cd_publicacao = pCd_publicacao;
+
+    IF qtd = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Publicação não encontrada';
+    ELSE
+
+        UPDATE Caderno_publicado
+        SET qt_acessos = qt_acessos + 1
+        WHERE cd_publicacao = pCd_publicacao;
+
+    END IF;
+END $$
 
 DROP PROCEDURE IF EXISTS criar_sessao$$
 CREATE PROCEDURE criar_sessao(
@@ -1162,7 +1433,7 @@ END $$
 
 
 DROP PROCEDURE IF EXISTS consultar_sessoes_abertas$$
-CREATE PROCEDURE consultar_sessoes_abertas()
+CREATE PROCEDURE consultar_sessoes_abertas(pStatus INT)
 BEGIN
     SELECT
         S.cd_sessao,
@@ -1179,7 +1450,7 @@ BEGIN
         ON S.criador_email = U.email
     LEFT JOIN Participante_sessao P
         ON S.cd_sessao = P.cd_sessao
-    WHERE S.privado = 0
+    WHERE S.privado = pStatus
     GROUP BY
         S.cd_sessao,
         S.criador_email,

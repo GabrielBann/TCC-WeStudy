@@ -164,6 +164,7 @@ CREATE TABLE Caderno_publicado (
 
 CREATE TABLE Caderno_aluno (
     cd_caderno INT NOT NULL,
+    usuario_email VARCHAR(100) NOT NULL,
     cd_guia INT,
     cd_publicacao INT,
     texto LONGTEXT NOT NULL,
@@ -171,6 +172,10 @@ CREATE TABLE Caderno_aluno (
     topico TINYTEXT NOT NULL,
 
     CONSTRAINT pk_caderno_aluno PRIMARY KEY (cd_caderno),
+
+    CONSTRAINT fk_caderno_aluno_usuario
+        FOREIGN KEY (usuario_email)
+        REFERENCES Usuario(email),
 
     CONSTRAINT fk_caderno_aluno_guia
         FOREIGN KEY (cd_guia)
