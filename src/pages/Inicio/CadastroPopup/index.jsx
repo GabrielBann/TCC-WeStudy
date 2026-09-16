@@ -1,6 +1,6 @@
 import "./index.css";
 import { useState } from "react";
-import Cadastrar from "../../funcoes/Cadastrar";
+import Cadastrar from "../../../funcoes/Cadastrar";
 import { useNavigate } from "react-router-dom";
 
 export default function CadastroPopup({ onClose }) {
