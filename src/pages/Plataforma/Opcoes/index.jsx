@@ -2,9 +2,9 @@ import { useNavigate } from "react-router-dom";
 import "./index.css"
 
 
-import GuiaIcon from "../../assets/Icones/Papel.svg";
-import SessaoIcon from "../../assets/Icones/Sessão.svg";
-import MarcadorIcon from "../../assets/Icones/Marcador.svg";
+import GuiaIcon from "../../../assets/Icones/Papel.svg";
+import SessaoIcon from "../../../assets/Icones/Sessão.svg";
+import MarcadorIcon from "../../../assets/Icones/Marcador.svg";
 
 export default function Opcoes() {
     const navigate = useNavigate();
