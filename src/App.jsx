@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Inicio from "./components/Inicio";
-import Plataforma from "./components/Plataforma";
-import Opcoes from "./components/Opcoes";
-import Perfil from "./components/Perfil";
+import Inicio from "./pages/Inicio";
+import Plataforma from "./pages/Plataforma";
+import Opcoes from "./pages/Opcoes";
+import Perfil from "./pages/Perfil";
 
 export default function App() {
     

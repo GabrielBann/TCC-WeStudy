@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import "./index.css"
 
-import MenuLateral from "../MenuLateral";
+import MenuLateral from "../../components/MenuLateral";
 import Logotipo from "../../assets/Logotipo WeStudy.png";
 import GrupoIcon from "../../assets/Icones/Grupo.svg";
 import NoficacoesIcon from "../../assets/Icones/Notificação.svg";

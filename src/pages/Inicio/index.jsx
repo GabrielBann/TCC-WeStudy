@@ -1,9 +1,9 @@
 import { useState } from "react";
-import LoginPopup from "LoginPopup";
-import CadastroPopup from "CadastroPopup";
+import LoginPopup from "./LoginPopup";
+import CadastroPopup from "./CadastroPopup";
 import GuideCard from "../../components/GuideCard";
 import MiniGuideCard from "../../components/MineGuideCard";
-import Logotipo from "../assets/Logotipo WeStudy.png";
+import Logotipo from "../../assets/Logotipo WeStudy.png";
 
 import './index.css';
 
