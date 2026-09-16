@@ -12,9 +12,19 @@ async function logar(req, res) {
 }
 
 async function cadastrar(req, res) {
-    const {email, senha, nome, tipo} = req.body
+    const {
+        email,
+        senha,
+        nome,
+        tipo
+    } = req.body
     try{
-        const user = await model.Cadastrar(email, senha, nome, tipo)
+        const user = await model.Cadastrar(
+            email,
+            senha,
+            nome,
+            tipo
+        )
         return res.json(user)
     }
     catch (error){
@@ -23,9 +33,17 @@ async function cadastrar(req, res) {
 }
 
 async function editar(req, res) {
-    const {email, senha, nome} = req.body
+    const {
+        email,
+        senha,
+        nome
+    } = req.body
     try{
-        const user = await model.Editar(email, senha, nome)
+        const user = await model.Editar(
+            email,
+            senha,
+            nome
+        )
         return res.json(user)
     }
     catch (error){
@@ -35,9 +53,15 @@ async function editar(req, res) {
 
 
 async function excluir(req, res) {
-    const {email, senha} = req.body
+    const {
+        email,
+        senha
+    } = req.body
     try{
-        const user = await model.Excluir(email, senha)
+        const user = await model.Excluir(
+            email,
+            senha
+        )
         return res.json(user)
     }
     catch (error){

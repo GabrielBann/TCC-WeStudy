@@ -6,7 +6,6 @@ CREATE PROCEDURE login_usuario(
     pSenha VARCHAR(64)
 )
 BEGIN
-
     DECLARE qtd INT DEFAULT 0;
 
     SELECT COUNT(*)
@@ -14,26 +13,20 @@ BEGIN
     FROM Usuario
     WHERE email = pEmail;
 
-    IF (qtd = 0) THEN
-
+    IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Email não cadastrado';
-
     ELSE
-
         SELECT COUNT(*)
         INTO qtd
         FROM Usuario
         WHERE email = pEmail
         AND senha = pSenha;
 
-        IF (qtd = 0) THEN
-
+        IF qtd = 0 THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Senha incorreta';
-
         ELSE
-
             SELECT
                 email,
                 nome,
@@ -42,12 +35,10 @@ BEGIN
                 desconto
             FROM Usuario
             WHERE email = pEmail;
-
         END IF;
-
     END IF;
-
 END $$
+
 
 DROP PROCEDURE IF EXISTS cadastrar_usuario$$
 CREATE PROCEDURE cadastrar_usuario(
@@ -59,7 +50,8 @@ CREATE PROCEDURE cadastrar_usuario(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pEmail;
 
@@ -94,7 +86,8 @@ CREATE PROCEDURE consultar_usuario(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pEmail;
 
@@ -118,7 +111,8 @@ CREATE PROCEDURE atualizar_usuario(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pEmail;
 
@@ -141,7 +135,8 @@ CREATE PROCEDURE excluir_usuario(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pEmail;
 
@@ -155,6 +150,8 @@ BEGIN
 END $$
 
 
+
+
 DROP PROCEDURE IF EXISTS cadastrar_qualificacao$$
 CREATE PROCEDURE cadastrar_qualificacao(
     pUsuario_email VARCHAR(100),
@@ -165,7 +162,8 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pUsuario_email
     AND tipo = 'Educador';
@@ -176,7 +174,8 @@ BEGIN
     ELSE
         SELECT IFNULL(MAX(cd_diploma) + 1, 1)
         INTO codigo
-        FROM Qualificacao;
+        FROM Qualificacao
+        WHERE usuario_email = pUsuario_email;
 
         INSERT INTO Qualificacao (
             cd_diploma,
@@ -201,7 +200,8 @@ CREATE PROCEDURE consultar_qualificacoes(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pUsuario_email;
 
@@ -211,31 +211,35 @@ BEGIN
     ELSE
         SELECT *
         FROM Qualificacao
-        WHERE usuario_email = pUsuario_email;
+        WHERE usuario_email = pUsuario_email
+        ORDER BY cd_diploma;
     END IF;
 END $$
 
 
 DROP PROCEDURE IF EXISTS excluir_qualificacao$$
 CREATE PROCEDURE excluir_qualificacao(
+    pUsuario_email VARCHAR(100),
     pCd_diploma INT
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Qualificacao
-    WHERE cd_diploma = pCd_diploma;
+    WHERE usuario_email = pUsuario_email
+    AND cd_diploma = pCd_diploma;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Qualificação não encontrada';
     ELSE
         DELETE FROM Qualificacao
-        WHERE cd_diploma = pCd_diploma;
+        WHERE usuario_email = pUsuario_email
+        AND cd_diploma = pCd_diploma;
     END IF;
 END $$
-
 
 DROP PROCEDURE IF EXISTS cadastrar_arquivo_guia$$
 CREATE PROCEDURE cadastrar_arquivo_guia(
@@ -266,7 +270,8 @@ CREATE PROCEDURE excluir_arquivo_guia(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Arquivo_guia
     WHERE cd_midia = pCd_midia;
 
@@ -279,7 +284,6 @@ BEGIN
     END IF;
 END $$
 
-
 DROP PROCEDURE IF EXISTS cadastrar_guia$$
 CREATE PROCEDURE cadastrar_guia(
     pAutor_email VARCHAR(100),
@@ -291,7 +295,8 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pAutor_email
     AND tipo = 'Educador';
@@ -331,7 +336,8 @@ CREATE PROCEDURE consultar_guia(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Guia
     WHERE cd_guia = pCd_guia;
 
@@ -357,7 +363,8 @@ CREATE PROCEDURE atualizar_guia(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Guia
     WHERE cd_guia = pCd_guia
     AND autor_email = pAutor_email;
@@ -370,7 +377,8 @@ BEGIN
         SET disciplina = pDisciplina,
             texto = pTexto,
             topico = pTopico
-        WHERE cd_guia = pCd_guia;
+        WHERE cd_guia = pCd_guia
+        AND autor_email = pAutor_email;
     END IF;
 END $$
 
@@ -383,7 +391,8 @@ CREATE PROCEDURE excluir_guia(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Guia
     WHERE cd_guia = pCd_guia
     AND autor_email = pAutor_email;
@@ -393,10 +402,10 @@ BEGIN
         SET MESSAGE_TEXT = 'Guia não encontrado ou usuário não é o autor';
     ELSE
         DELETE FROM Guia
-        WHERE cd_guia = pCd_guia;
+        WHERE cd_guia = pCd_guia
+        AND autor_email = pAutor_email;
     END IF;
 END $$
-
 
 DROP PROCEDURE IF EXISTS adicionar_arquivo_guia$$
 CREATE PROCEDURE adicionar_arquivo_guia(
@@ -408,15 +417,18 @@ BEGIN
     DECLARE qtd_guia INT DEFAULT 0;
     DECLARE qtd_relacao INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd_arquivo
+    SELECT COUNT(*)
+    INTO qtd_arquivo
     FROM Arquivo_guia
     WHERE cd_midia = pCd_arquivo;
 
-    SELECT COUNT(*) INTO qtd_guia
+    SELECT COUNT(*)
+    INTO qtd_guia
     FROM Guia
     WHERE cd_guia = pCd_guia;
 
-    SELECT COUNT(*) INTO qtd_relacao
+    SELECT COUNT(*)
+    INTO qtd_relacao
     FROM Guia_Arquivo
     WHERE cd_arquivo = pCd_arquivo
     AND cd_guia = pCd_guia;
@@ -451,7 +463,8 @@ CREATE PROCEDURE remover_arquivo_guia(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Guia_Arquivo
     WHERE cd_arquivo = pCd_arquivo
     AND cd_guia = pCd_guia;
@@ -466,7 +479,6 @@ BEGIN
     END IF;
 END $$
 
-
 DROP PROCEDURE IF EXISTS cadastrar_pergunta$$
 CREATE PROCEDURE cadastrar_pergunta(
     pCd_guia INT,
@@ -478,7 +490,8 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Guia
     WHERE cd_guia = pCd_guia;
 
@@ -488,7 +501,8 @@ BEGIN
     ELSE
         SELECT IFNULL(MAX(cd_pergunta) + 1, 1)
         INTO codigo
-        FROM Pergunta_guia;
+        FROM Pergunta_guia
+        WHERE cd_guia = pCd_guia;
 
         INSERT INTO Pergunta_guia (
             cd_pergunta,
@@ -515,7 +529,8 @@ CREATE PROCEDURE consultar_perguntas_guia(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Guia
     WHERE cd_guia = pCd_guia;
 
@@ -525,13 +540,15 @@ BEGIN
     ELSE
         SELECT *
         FROM Pergunta_guia
-        WHERE cd_guia = pCd_guia;
+        WHERE cd_guia = pCd_guia
+        ORDER BY cd_pergunta;
     END IF;
 END $$
 
 
 DROP PROCEDURE IF EXISTS atualizar_pergunta$$
 CREATE PROCEDURE atualizar_pergunta(
+    pCd_guia INT,
     pCd_pergunta INT,
     pEnunciado TEXT,
     pTipo ENUM('Dissertativa','Alternativa'),
@@ -540,9 +557,11 @@ CREATE PROCEDURE atualizar_pergunta(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Pergunta_guia
-    WHERE cd_pergunta = pCd_pergunta;
+    WHERE cd_guia = pCd_guia
+    AND cd_pergunta = pCd_pergunta;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
@@ -552,34 +571,40 @@ BEGIN
         SET enunciado = pEnunciado,
             tipo = pTipo,
             resposta_certa = pResposta_certa
-        WHERE cd_pergunta = pCd_pergunta;
+        WHERE cd_guia = pCd_guia
+        AND cd_pergunta = pCd_pergunta;
     END IF;
 END $$
 
 
 DROP PROCEDURE IF EXISTS excluir_pergunta$$
 CREATE PROCEDURE excluir_pergunta(
+    pCd_guia INT,
     pCd_pergunta INT
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Pergunta_guia
-    WHERE cd_pergunta = pCd_pergunta;
+    WHERE cd_guia = pCd_guia
+    AND cd_pergunta = pCd_pergunta;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Pergunta não encontrada';
     ELSE
         DELETE FROM Pergunta_guia
-        WHERE cd_pergunta = pCd_pergunta;
+        WHERE cd_guia = pCd_guia
+        AND cd_pergunta = pCd_pergunta;
     END IF;
 END $$
 
 
 DROP PROCEDURE IF EXISTS cadastrar_alternativa$$
 CREATE PROCEDURE cadastrar_alternativa(
+    pCd_guia INT,
     pCd_pergunta INT,
     pResposta TINYTEXT
 )
@@ -588,14 +613,18 @@ BEGIN
     DECLARE qtd_alternativas INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Pergunta_guia
-    WHERE cd_pergunta = pCd_pergunta
+    WHERE cd_guia = pCd_guia
+    AND cd_pergunta = pCd_pergunta
     AND tipo = 'Alternativa';
 
-    SELECT COUNT(*) INTO qtd_alternativas
+    SELECT COUNT(*)
+    INTO qtd_alternativas
     FROM Alternativa
-    WHERE cd_pergunta = pCd_pergunta;
+    WHERE cd_guia = pCd_guia
+    AND cd_pergunta = pCd_pergunta;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
@@ -606,14 +635,18 @@ BEGIN
     ELSE
         SELECT IFNULL(MAX(cd_alternativa) + 1, 1)
         INTO codigo
-        FROM Alternativa;
+        FROM Alternativa
+        WHERE cd_guia = pCd_guia
+        AND cd_pergunta = pCd_pergunta;
 
         INSERT INTO Alternativa (
+            cd_guia,
             cd_alternativa,
             cd_pergunta,
             resposta
         )
         VALUES (
+            pCd_guia,
             codigo,
             pCd_pergunta,
             pResposta
@@ -624,14 +657,17 @@ END $$
 
 DROP PROCEDURE IF EXISTS consultar_alternativas$$
 CREATE PROCEDURE consultar_alternativas(
+    pCd_guia INT,
     pCd_pergunta INT
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Pergunta_guia
-    WHERE cd_pergunta = pCd_pergunta;
+    WHERE cd_guia = pCd_guia
+    AND cd_pergunta = pCd_pergunta;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
@@ -639,28 +675,37 @@ BEGIN
     ELSE
         SELECT *
         FROM Alternativa
-        WHERE cd_pergunta = pCd_pergunta;
+        WHERE cd_guia = pCd_guia
+        AND cd_pergunta = pCd_pergunta
+        ORDER BY cd_alternativa;
     END IF;
 END $$
 
 
 DROP PROCEDURE IF EXISTS excluir_alternativa$$
 CREATE PROCEDURE excluir_alternativa(
+    pCd_guia INT,
+    pCd_pergunta INT,
     pCd_alternativa INT
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Alternativa
-    WHERE cd_alternativa = pCd_alternativa;
+    WHERE cd_guia = pCd_guia
+    AND cd_pergunta = pCd_pergunta
+    AND cd_alternativa = pCd_alternativa;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Alternativa não encontrada';
     ELSE
         DELETE FROM Alternativa
-        WHERE cd_alternativa = pCd_alternativa;
+        WHERE cd_guia = pCd_guia
+        AND cd_pergunta = pCd_pergunta
+        AND cd_alternativa = pCd_alternativa;
     END IF;
 END $$
 
@@ -676,7 +721,8 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE publicado INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Guia
     WHERE cd_guia = pCd_guia
     AND cd_publicacao IS NULL;
@@ -729,7 +775,6 @@ BEGIN
         ON G.cd_publicacao = GP.cd_publicado;
 END $$
 
-
 DROP PROCEDURE IF EXISTS adquirir_guia$$
 CREATE PROCEDURE adquirir_guia(
     pCd_publicacao INT,
@@ -739,24 +784,22 @@ BEGIN
     DECLARE qtd_publicacao INT DEFAULT 0;
     DECLARE qtd_usuario INT DEFAULT 0;
     DECLARE qtd_acesso INT DEFAULT 0;
-    DECLARE tipo_guia VARCHAR(20);
 
-    SELECT COUNT(*) INTO qtd_publicacao
+    SELECT COUNT(*)
+    INTO qtd_publicacao
     FROM Guia_publicado
     WHERE cd_publicado = pCd_publicacao;
 
-    SELECT COUNT(*) INTO qtd_usuario
+    SELECT COUNT(*)
+    INTO qtd_usuario
     FROM Usuario
     WHERE email = pUsuario_email;
 
-    SELECT COUNT(*) INTO qtd_acesso
+    SELECT COUNT(*)
+    INTO qtd_acesso
     FROM Acesso_guia
     WHERE cd_publicacao = pCd_publicacao
     AND usuario_email = pUsuario_email;
-
-    SELECT tipo INTO tipo_guia
-    FROM Guia_publicado
-    WHERE cd_publicado = pCd_publicacao;
 
     IF qtd_publicacao = 0 THEN
         SIGNAL SQLSTATE '45000'
@@ -787,7 +830,8 @@ CREATE PROCEDURE consultar_guias_usuario(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pUsuario_email;
 
@@ -821,7 +865,8 @@ CREATE PROCEDURE remover_acesso_guia(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Acesso_guia
     WHERE cd_publicacao = pCd_publicacao
     AND usuario_email = pUsuario_email;
@@ -836,7 +881,6 @@ BEGIN
     END IF;
 END $$
 
-
 DROP PROCEDURE IF EXISTS criar_amizade$$
 CREATE PROCEDURE criar_amizade(
     pAmigo_1 VARCHAR(100),
@@ -848,15 +892,18 @@ BEGIN
     DECLARE qtd_amizade INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd_1
+    SELECT COUNT(*)
+    INTO qtd_1
     FROM Usuario
     WHERE email = pAmigo_1;
 
-    SELECT COUNT(*) INTO qtd_2
+    SELECT COUNT(*)
+    INTO qtd_2
     FROM Usuario
     WHERE email = pAmigo_2;
 
-    SELECT COUNT(*) INTO qtd_amizade
+    SELECT COUNT(*)
+    INTO qtd_amizade
     FROM Amizade
     WHERE (amigo_1 = pAmigo_1 AND amigo_2 = pAmigo_2)
        OR (amigo_1 = pAmigo_2 AND amigo_2 = pAmigo_1);
@@ -894,12 +941,13 @@ END $$
 DROP PROCEDURE IF EXISTS atualizar_amizade$$
 CREATE PROCEDURE atualizar_amizade(
     pCd_amizade INT,
-    pStatus ENUM('Pendente','Aceito','Negado')
+    pStatus ENUM('Pendente','Aceito')
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Amizade
     WHERE cd_amizade = pCd_amizade;
 
@@ -921,7 +969,8 @@ CREATE PROCEDURE excluir_amizade(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Amizade
     WHERE cd_amizade = pCd_amizade;
 
@@ -933,7 +982,6 @@ BEGIN
         WHERE cd_amizade = pCd_amizade;
     END IF;
 END $$
-
 
 DROP PROCEDURE IF EXISTS cadastrar_caderno$$
 CREATE PROCEDURE cadastrar_caderno(
@@ -947,7 +995,8 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Usuario
     WHERE email = pEmail;
 
@@ -955,10 +1004,9 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Usuário não encontrado';
     ELSE
-
         IF pCd_guia IS NOT NULL THEN
-
-            SELECT COUNT(*) INTO qtd
+            SELECT COUNT(*)
+            INTO qtd
             FROM Guia
             WHERE cd_guia = pCd_guia;
 
@@ -966,12 +1014,12 @@ BEGIN
                 SIGNAL SQLSTATE '45000'
                 SET MESSAGE_TEXT = 'Guia não encontrado';
             END IF;
-
         END IF;
 
         SELECT IFNULL(MAX(cd_caderno) + 1, 1)
         INTO codigo
-        FROM Caderno_aluno;
+        FROM Caderno_aluno
+        WHERE usuario_email = pEmail;
 
         INSERT INTO Caderno_aluno (
             cd_caderno,
@@ -991,7 +1039,6 @@ BEGIN
             pDisciplina,
             pTopico
         );
-
     END IF;
 END $$
 
@@ -1007,7 +1054,8 @@ CREATE PROCEDURE atualizar_caderno(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Caderno_aluno
     WHERE cd_caderno = pCd_caderno
     AND usuario_email = pEmail;
@@ -1016,34 +1064,34 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Caderno não encontrado ou não pertence ao usuário';
     ELSE
-
         UPDATE Caderno_aluno
         SET texto = pTexto,
             disciplina = pDisciplina,
             topico = pTopico
         WHERE cd_caderno = pCd_caderno
         AND usuario_email = pEmail;
-
     END IF;
 END $$
 
 
 DROP PROCEDURE IF EXISTS consultar_caderno$$
 CREATE PROCEDURE consultar_caderno(
+    pEmail VARCHAR(100),
     pCd_caderno INT
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Caderno_aluno
-    WHERE cd_caderno = pCd_caderno;
+    WHERE cd_caderno = pCd_caderno
+    AND usuario_email = pEmail;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Caderno não encontrado';
+        SET MESSAGE_TEXT = 'Caderno não encontrado ou não pertence ao usuário';
     ELSE
-
         SELECT
             cd_caderno,
             usuario_email,
@@ -1053,17 +1101,17 @@ BEGIN
             disciplina,
             topico
         FROM Caderno_aluno
-        WHERE cd_caderno = pCd_caderno;
-
+        WHERE cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
     END IF;
 END $$
 
-$$
-CREATE PROCEDURE buscar_cadernos_usuario(
+
+DROP PROCEDURE IF EXISTS consultar_cadernos_usuario$$
+CREATE PROCEDURE consultar_cadernos_usuario(
     pEmail VARCHAR(100)
 )
 BEGIN
-
     SELECT
         cd_caderno,
         cd_guia,
@@ -1072,12 +1120,13 @@ BEGIN
         disciplina,
         topico
     FROM Caderno_aluno
-    WHERE usuario_email = pEmail;
-
+    WHERE usuario_email = pEmail
+    ORDER BY cd_caderno;
 END $$
 
 
 DROP PROCEDURE IF EXISTS excluir_caderno$$
+
 CREATE PROCEDURE excluir_caderno(
     pEmail VARCHAR(100),
     pCd_caderno INT
@@ -1085,25 +1134,28 @@ CREATE PROCEDURE excluir_caderno(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Caderno_aluno
     WHERE cd_caderno = pCd_caderno
-    AND usuario_email = pEmail;
+      AND usuario_email = pEmail;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Caderno não encontrado ou não pertence ao usuário';
-    ELSE
-
-        DELETE FROM Caderno_aluno
-        WHERE cd_caderno = pCd_caderno
-        AND usuario_email = pEmail;
-
+        SET MESSAGE_TEXT = 'Caderno não encontrado para este usuário';
     END IF;
-END $$
 
+    DELETE FROM Caderno_publicado
+    WHERE cd_caderno = pCd_caderno
+      AND usuario_email = pEmail;
+
+    DELETE FROM Caderno_aluno
+    WHERE cd_caderno = pCd_caderno
+      AND usuario_email = pEmail;
+END$$
 
 DROP PROCEDURE IF EXISTS publicar_caderno$$
+
 CREATE PROCEDURE publicar_caderno(
     pEmail VARCHAR(100),
     pCd_caderno INT
@@ -1112,7 +1164,8 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Caderno_aluno
     WHERE cd_caderno = pCd_caderno
     AND usuario_email = pEmail
@@ -1125,15 +1178,20 @@ BEGIN
 
         SELECT IFNULL(MAX(cd_publicacao) + 1, 1)
         INTO codigo
-        FROM Caderno_publicado;
+        FROM Caderno_publicado
+        WHERE usuario_email = pEmail;
 
         INSERT INTO Caderno_publicado (
             cd_publicacao,
+            cd_caderno,
+            usuario_email,
             data_publicacao,
             qt_acessos
         )
         VALUES (
             codigo,
+            pCd_caderno,
+            pEmail,
             CURDATE(),
             0
         );
@@ -1156,7 +1214,8 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Caderno_aluno
     WHERE cd_caderno = pCd_caderno
     AND usuario_email = pEmail
@@ -1166,11 +1225,11 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Caderno não encontrado, não pertence ao usuário ou não está publicado';
     ELSE
-
         SELECT cd_publicacao
         INTO codigo
         FROM Caderno_aluno
-        WHERE cd_caderno = pCd_caderno;
+        WHERE cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
 
         UPDATE Caderno_aluno
         SET cd_publicacao = NULL
@@ -1178,8 +1237,9 @@ BEGIN
         AND usuario_email = pEmail;
 
         DELETE FROM Caderno_publicado
-        WHERE cd_publicacao = codigo;
-
+        WHERE cd_publicacao = codigo
+        AND cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
     END IF;
 END $$
 
@@ -1187,7 +1247,6 @@ END $$
 DROP PROCEDURE IF EXISTS consultar_cadernos_publicados$$
 CREATE PROCEDURE consultar_cadernos_publicados()
 BEGIN
-
     SELECT
         C.cd_caderno,
         C.usuario_email,
@@ -1200,29 +1259,34 @@ BEGIN
         P.qt_acessos
     FROM Caderno_aluno C
     INNER JOIN Caderno_publicado P
-        ON C.cd_publicacao = P.cd_publicacao;
-
+        ON C.cd_caderno = P.cd_caderno
+        AND C.usuario_email = P.usuario_email
+        AND C.cd_publicacao = P.cd_publicacao;
 END $$
 
 
 DROP PROCEDURE IF EXISTS consultar_caderno_publicado$$
 CREATE PROCEDURE consultar_caderno_publicado(
+    pEmail VARCHAR(100),
     pCd_caderno INT
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Caderno_aluno C
     INNER JOIN Caderno_publicado P
-        ON C.cd_publicacao = P.cd_publicacao
-    WHERE C.cd_caderno = pCd_caderno;
+        ON C.cd_caderno = P.cd_caderno
+        AND C.usuario_email = P.usuario_email
+        AND C.cd_publicacao = P.cd_publicacao
+    WHERE C.cd_caderno = pCd_caderno
+    AND C.usuario_email = pEmail;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Caderno não encontrado ou não está publicado';
     ELSE
-
         SELECT
             C.cd_caderno,
             C.usuario_email,
@@ -1235,40 +1299,49 @@ BEGIN
             P.qt_acessos
         FROM Caderno_aluno C
         INNER JOIN Caderno_publicado P
-            ON C.cd_publicacao = P.cd_publicacao
-        WHERE C.cd_caderno = pCd_caderno;
-
+            ON C.cd_caderno = P.cd_caderno
+            AND C.usuario_email = P.usuario_email
+            AND C.cd_publicacao = P.cd_publicacao
+        WHERE C.cd_caderno = pCd_caderno
+        AND C.usuario_email = pEmail;
     END IF;
 END $$
 
 
 DROP PROCEDURE IF EXISTS acessar_caderno_publicado$$
 CREATE PROCEDURE acessar_caderno_publicado(
+    pEmail VARCHAR(100),
     pCd_caderno INT
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Caderno_aluno C
     INNER JOIN Caderno_publicado P
-        ON C.cd_publicacao = P.cd_publicacao
-    WHERE C.cd_caderno = pCd_caderno;
+        ON C.cd_caderno = P.cd_caderno
+        AND C.usuario_email = P.usuario_email
+        AND C.cd_publicacao = P.cd_publicacao
+    WHERE C.cd_caderno = pCd_caderno
+    AND C.usuario_email = pEmail;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Caderno não encontrado ou não está publicado';
     ELSE
-
         SELECT cd_publicacao
         INTO codigo
         FROM Caderno_aluno
-        WHERE cd_caderno = pCd_caderno;
+        WHERE cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
 
         UPDATE Caderno_publicado
         SET qt_acessos = qt_acessos + 1
-        WHERE cd_publicacao = codigo;
+        WHERE cd_publicacao = codigo
+        AND cd_caderno = pCd_caderno
+        AND usuario_email = pEmail;
 
         SELECT
             C.cd_caderno,
@@ -1282,9 +1355,11 @@ BEGIN
             P.qt_acessos
         FROM Caderno_aluno C
         INNER JOIN Caderno_publicado P
-            ON C.cd_publicacao = P.cd_publicacao
-        WHERE C.cd_caderno = pCd_caderno;
-
+            ON C.cd_caderno = P.cd_caderno
+            AND C.usuario_email = P.usuario_email
+            AND C.cd_publicacao = P.cd_publicacao
+        WHERE C.cd_caderno = pCd_caderno
+        AND C.usuario_email = pEmail;
     END IF;
 END $$
 
@@ -1294,7 +1369,6 @@ CREATE PROCEDURE consultar_cadernos_publicados_disciplina(
     pDisciplina TINYTEXT
 )
 BEGIN
-
     SELECT
         C.cd_caderno,
         C.usuario_email,
@@ -1307,9 +1381,10 @@ BEGIN
         P.qt_acessos
     FROM Caderno_aluno C
     INNER JOIN Caderno_publicado P
-        ON C.cd_publicacao = P.cd_publicacao
+        ON C.cd_caderno = P.cd_caderno
+        AND C.usuario_email = P.usuario_email
+        AND C.cd_publicacao = P.cd_publicacao
     WHERE C.disciplina = pDisciplina;
-
 END $$
 
 
@@ -1318,7 +1393,6 @@ CREATE PROCEDURE consultar_cadernos_publicados_topico(
     pTopico TINYTEXT
 )
 BEGIN
-
     SELECT
         C.cd_caderno,
         C.usuario_email,
@@ -1331,34 +1405,46 @@ BEGIN
         P.qt_acessos
     FROM Caderno_aluno C
     INNER JOIN Caderno_publicado P
-        ON C.cd_publicacao = P.cd_publicacao
+        ON C.cd_caderno = P.cd_caderno
+        AND C.usuario_email = P.usuario_email
+        AND C.cd_publicacao = P.cd_publicacao
     WHERE C.topico = pTopico;
-
 END $$
 
 
 DROP PROCEDURE IF EXISTS atualizar_acessos_caderno$$
 CREATE PROCEDURE atualizar_acessos_caderno(
+    pEmail VARCHAR(100),
+    pCd_caderno INT,
     pCd_publicacao INT
 )
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Caderno_publicado
-    WHERE cd_publicacao = pCd_publicacao;
+    WHERE usuario_email = pEmail
+    AND cd_caderno = pCd_caderno
+    AND cd_publicacao = pCd_publicacao;
 
     IF qtd = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Publicação não encontrada';
     ELSE
-
         UPDATE Caderno_publicado
         SET qt_acessos = qt_acessos + 1
-        WHERE cd_publicacao = pCd_publicacao;
-
+        WHERE usuario_email = pEmail
+        AND cd_caderno = pCd_caderno
+        AND cd_publicacao = pCd_publicacao;
     END IF;
 END $$
+
+
+/* =========================================================
+   SESSÃO
+   cd_sessao continua global
+   ========================================================= */
 
 DROP PROCEDURE IF EXISTS criar_sessao$$
 CREATE PROCEDURE criar_sessao(
@@ -1376,12 +1462,14 @@ BEGIN
     DECLARE qtd_guia INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd_usuario
+    SELECT COUNT(*)
+    INTO qtd_usuario
     FROM Usuario
     WHERE email = pCriador_email;
 
     IF pCd_guia IS NOT NULL THEN
-        SELECT COUNT(*) INTO qtd_guia
+        SELECT COUNT(*)
+        INTO qtd_guia
         FROM Guia
         WHERE cd_guia = pCd_guia;
     END IF;
@@ -1432,8 +1520,106 @@ BEGIN
 END $$
 
 
+DROP PROCEDURE IF EXISTS cadastrar_sessao$$
+CREATE PROCEDURE cadastrar_sessao(
+    pCriador_email VARCHAR(100),
+    pCd_guia INT,
+    pTopico TINYTEXT,
+    pDisciplina TINYTEXT,
+    pPrivado TINYINT,
+    pQt_pessoas_limite INT,
+    pCodigo_entrada CHAR(9),
+    pTexto_caderno LONGTEXT
+)
+BEGIN
+    DECLARE qtd_usuario INT DEFAULT 0;
+    DECLARE qtd_guia INT DEFAULT 0;
+    DECLARE codigo INT DEFAULT 0;
+
+    SELECT COUNT(*)
+    INTO qtd_usuario
+    FROM Usuario
+    WHERE email = pCriador_email;
+
+    IF qtd_usuario = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Usuário não encontrado';
+    END IF;
+
+    IF pCd_guia IS NOT NULL THEN
+        SELECT COUNT(*)
+        INTO qtd_guia
+        FROM Guia
+        WHERE cd_guia = pCd_guia;
+
+        IF qtd_guia = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Guia não encontrado';
+        END IF;
+    END IF;
+
+    IF pPrivado NOT IN (0, 1) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Valor de privacidade inválido';
+    END IF;
+
+    IF pQt_pessoas_limite <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'O limite de participantes deve ser maior que zero';
+    END IF;
+
+    IF pPrivado = 1 AND pCodigo_entrada IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Sessões privadas precisam de código de entrada';
+    END IF;
+
+    IF pPrivado = 0 AND pCodigo_entrada IS NOT NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Sessões públicas não devem possuir código de entrada';
+    END IF;
+
+    SELECT IFNULL(MAX(cd_sessao) + 1, 1)
+    INTO codigo
+    FROM Sessao;
+
+    INSERT INTO Sessao (
+        cd_sessao,
+        criador_email,
+        cd_guia,
+        topico,
+        disciplina,
+        privado,
+        qt_pessoas_limite,
+        codigo_entrada,
+        texto_caderno
+    )
+    VALUES (
+        codigo,
+        pCriador_email,
+        pCd_guia,
+        pTopico,
+        pDisciplina,
+        pPrivado,
+        pQt_pessoas_limite,
+        pCodigo_entrada,
+        pTexto_caderno
+    );
+
+    INSERT INTO Participante_sessao (
+        cd_sessao,
+        usuario_email
+    )
+    VALUES (
+        codigo,
+        pCriador_email
+    );
+END $$
+
+
 DROP PROCEDURE IF EXISTS consultar_sessoes_abertas$$
-CREATE PROCEDURE consultar_sessoes_abertas(pStatus INT)
+CREATE PROCEDURE consultar_sessoes_abertas(
+    pStatus INT
+)
 BEGIN
     SELECT
         S.cd_sessao,
@@ -1478,27 +1664,33 @@ BEGIN
     DECLARE privada TINYINT DEFAULT 0;
     DECLARE codigo CHAR(9);
 
-    SELECT COUNT(*) INTO qtd_sessao
+    SELECT COUNT(*)
+    INTO qtd_sessao
     FROM Sessao
     WHERE cd_sessao = pCd_sessao;
 
-    SELECT COUNT(*) INTO qtd_usuario
+    SELECT COUNT(*)
+    INTO qtd_usuario
     FROM Usuario
     WHERE email = pUsuario_email;
 
-    SELECT COUNT(*) INTO qtd_participante
-    FROM Participante_sessao
-    WHERE cd_sessao = pCd_sessao
-    AND usuario_email = pUsuario_email;
+    IF qtd_sessao > 0 THEN
+        SELECT privado, qt_pessoas_limite, codigo_entrada
+        INTO privada, limite, codigo
+        FROM Sessao
+        WHERE cd_sessao = pCd_sessao;
 
-    SELECT privado, qt_pessoas_limite, codigo_entrada
-    INTO privada, limite, codigo
-    FROM Sessao
-    WHERE cd_sessao = pCd_sessao;
+        SELECT COUNT(*)
+        INTO qtd_participante
+        FROM Participante_sessao
+        WHERE cd_sessao = pCd_sessao
+        AND usuario_email = pUsuario_email;
 
-    SELECT COUNT(*) INTO qtd_pessoas
-    FROM Participante_sessao
-    WHERE cd_sessao = pCd_sessao;
+        SELECT COUNT(*)
+        INTO qtd_pessoas
+        FROM Participante_sessao
+        WHERE cd_sessao = pCd_sessao;
+    END IF;
 
     IF qtd_sessao = 0 THEN
         SIGNAL SQLSTATE '45000'
@@ -1537,12 +1729,14 @@ BEGIN
     DECLARE qtd INT DEFAULT 0;
     DECLARE criador VARCHAR(100);
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Participante_sessao
     WHERE cd_sessao = pCd_sessao
     AND usuario_email = pUsuario_email;
 
-    SELECT criador_email INTO criador
+    SELECT criador_email
+    INTO criador
     FROM Sessao
     WHERE cd_sessao = pCd_sessao;
 
@@ -1568,7 +1762,8 @@ CREATE PROCEDURE encerrar_sessao(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Sessao
     WHERE cd_sessao = pCd_sessao
     AND criador_email = pCriador_email;
@@ -1599,12 +1794,14 @@ BEGIN
     DECLARE qtd_criador INT DEFAULT 0;
     DECLARE qtd_participante INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd_criador
+    SELECT COUNT(*)
+    INTO qtd_criador
     FROM Sessao
     WHERE cd_sessao = pCd_sessao
     AND criador_email = pCriador_email;
 
-    SELECT COUNT(*) INTO qtd_participante
+    SELECT COUNT(*)
+    INTO qtd_participante
     FROM Participante_sessao
     WHERE cd_sessao = pCd_sessao
     AND usuario_email = pUsuario_email;
@@ -1640,15 +1837,18 @@ BEGIN
     DECLARE qtd_usuario INT DEFAULT 0;
     DECLARE qtd_participante INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd_sessao
+    SELECT COUNT(*)
+    INTO qtd_sessao
     FROM Sessao
     WHERE cd_sessao = pCd_sessao;
 
-    SELECT COUNT(*) INTO qtd_usuario
+    SELECT COUNT(*)
+    INTO qtd_usuario
     FROM Usuario
     WHERE email = pUsuario_email;
 
-    SELECT COUNT(*) INTO qtd_participante
+    SELECT COUNT(*)
+    INTO qtd_participante
     FROM Participante_sessao
     WHERE cd_sessao = pCd_sessao
     AND usuario_email = pUsuario_email;
@@ -1682,7 +1882,8 @@ CREATE PROCEDURE consultar_participantes(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Sessao
     WHERE cd_sessao = pCd_sessao;
 
@@ -1701,7 +1902,6 @@ BEGIN
     END IF;
 END $$
 
-
 DROP PROCEDURE IF EXISTS enviar_mensagem$$
 CREATE PROCEDURE enviar_mensagem(
     pParticipante_email VARCHAR(100),
@@ -1713,7 +1913,8 @@ BEGIN
     DECLARE qtd_participante INT DEFAULT 0;
     DECLARE codigo INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd_participante
+    SELECT COUNT(*)
+    INTO qtd_participante
     FROM Participante_sessao
     WHERE cd_sessao = pCd_sessao
     AND usuario_email = pParticipante_email;
@@ -1727,7 +1928,8 @@ BEGIN
     ELSE
         SELECT IFNULL(MAX(cd_mensagem) + 1, 1)
         INTO codigo
-        FROM Mensagem;
+        FROM Mensagem
+        WHERE cd_sessao = pCd_sessao;
 
         INSERT INTO Mensagem (
             cd_mensagem,
@@ -1756,7 +1958,8 @@ CREATE PROCEDURE consultar_mensagens(
 BEGIN
     DECLARE qtd INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd
+    SELECT COUNT(*)
+    INTO qtd
     FROM Sessao
     WHERE cd_sessao = pCd_sessao;
 
@@ -1775,13 +1978,14 @@ BEGIN
         INNER JOIN Usuario U
             ON M.participante_email = U.email
         WHERE M.cd_sessao = pCd_sessao
-        ORDER BY M.data;
+        ORDER BY M.cd_mensagem;
     END IF;
 END $$
 
 
 DROP PROCEDURE IF EXISTS excluir_mensagem$$
 CREATE PROCEDURE excluir_mensagem(
+    pCd_sessao INT,
     pCd_mensagem INT,
     pCriador_email VARCHAR(100)
 )
@@ -1789,16 +1993,17 @@ BEGIN
     DECLARE qtd_mensagem INT DEFAULT 0;
     DECLARE qtd_criador INT DEFAULT 0;
 
-    SELECT COUNT(*) INTO qtd_mensagem
+    SELECT COUNT(*)
+    INTO qtd_mensagem
     FROM Mensagem
-    WHERE cd_mensagem = pCd_mensagem;
+    WHERE cd_sessao = pCd_sessao
+    AND cd_mensagem = pCd_mensagem;
 
-    SELECT COUNT(*) INTO qtd_criador
-    FROM Mensagem M
-    INNER JOIN Sessao S
-        ON M.cd_sessao = S.cd_sessao
-    WHERE M.cd_mensagem = pCd_mensagem
-    AND S.criador_email = pCriador_email;
+    SELECT COUNT(*)
+    INTO qtd_criador
+    FROM Sessao
+    WHERE cd_sessao = pCd_sessao
+    AND criador_email = pCriador_email;
 
     IF qtd_mensagem = 0 THEN
         SIGNAL SQLSTATE '45000'
@@ -1808,7 +2013,8 @@ BEGIN
         SET MESSAGE_TEXT = 'Usuário não é o criador da sessão';
     ELSE
         DELETE FROM Mensagem
-        WHERE cd_mensagem = pCd_mensagem;
+        WHERE cd_sessao = pCd_sessao
+        AND cd_mensagem = pCd_mensagem;
     END IF;
 END $$
 

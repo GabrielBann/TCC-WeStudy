@@ -2,11 +2,15 @@ DROP SCHEMA IF EXISTS WeStudy;
 CREATE SCHEMA WeStudy;
 USE WeStudy;
 
+
 CREATE TABLE Materia(
-cd_materia INT NOT NULL,
-nm_materia VARCHAR(64) NOT NULL,
-CONSTRAINT pk_materia PRIMARY KEY (cd_materia)
+    cd_materia INT NOT NULL,
+    nm_materia VARCHAR(64) NOT NULL,
+
+    CONSTRAINT pk_materia
+        PRIMARY KEY (cd_materia)
 );
+
 
 CREATE TABLE Usuario (
     email VARCHAR(100) NOT NULL,
@@ -16,7 +20,8 @@ CREATE TABLE Usuario (
     tipo ENUM('Educador','Aluno') NOT NULL,
     desconto INT,
 
-    CONSTRAINT pk_usuario PRIMARY KEY (email)
+    CONSTRAINT pk_usuario
+        PRIMARY KEY (email)
 );
 
 
@@ -26,7 +31,8 @@ CREATE TABLE Qualificacao (
     arquivo BLOB,
     link VARCHAR(500),
 
-    CONSTRAINT pk_qualificacao PRIMARY KEY (cd_diploma),
+    CONSTRAINT pk_qualificacao
+        PRIMARY KEY (cd_diploma, usuario_email),
 
     CONSTRAINT fk_qualificacao_usuario
         FOREIGN KEY (usuario_email)
@@ -38,7 +44,8 @@ CREATE TABLE Arquivo_guia (
     cd_midia INT NOT NULL,
     arquivo BLOB NOT NULL,
 
-    CONSTRAINT pk_arquivo_guia PRIMARY KEY (cd_midia)
+    CONSTRAINT pk_arquivo_guia
+        PRIMARY KEY (cd_midia)
 );
 
 
@@ -49,7 +56,8 @@ CREATE TABLE Guia_publicado (
     descricao VARCHAR(500) NOT NULL,
     tipo ENUM('Pago','Gratuito') NOT NULL,
 
-    CONSTRAINT pk_guia_publicado PRIMARY KEY (cd_publicado)
+    CONSTRAINT pk_guia_publicado
+        PRIMARY KEY (cd_publicado)
 );
 
 
@@ -61,7 +69,8 @@ CREATE TABLE Guia (
     texto LONGTEXT NOT NULL,
     topico TEXT NOT NULL,
 
-    CONSTRAINT pk_guia PRIMARY KEY (cd_guia),
+    CONSTRAINT pk_guia
+        PRIMARY KEY (cd_guia),
 
     CONSTRAINT fk_guia_publicacao
         FOREIGN KEY (cd_publicacao)
@@ -97,7 +106,8 @@ CREATE TABLE Pergunta_guia (
     tipo ENUM('Dissertativa','Alternativa') NOT NULL,
     resposta_certa TEXT NOT NULL,
 
-    CONSTRAINT pk_pergunta_guia PRIMARY KEY (cd_pergunta),
+    CONSTRAINT pk_pergunta_guia
+        PRIMARY KEY (cd_pergunta, cd_guia),
 
     CONSTRAINT fk_pergunta_guia_guia
         FOREIGN KEY (cd_guia)
@@ -108,13 +118,15 @@ CREATE TABLE Pergunta_guia (
 CREATE TABLE Alternativa (
     cd_alternativa INT NOT NULL,
     cd_pergunta INT NOT NULL,
+    cd_guia INT NOT NULL,
     resposta TINYTEXT NOT NULL,
 
-    CONSTRAINT pk_alternativa PRIMARY KEY (cd_alternativa),
+    CONSTRAINT pk_alternativa
+        PRIMARY KEY (cd_alternativa, cd_pergunta, cd_guia),
 
     CONSTRAINT fk_alternativa_pergunta
-        FOREIGN KEY (cd_pergunta)
-        REFERENCES Pergunta_guia(cd_pergunta)
+        FOREIGN KEY (cd_pergunta, cd_guia)
+        REFERENCES Pergunta_guia(cd_pergunta, cd_guia)
 );
 
 
@@ -139,9 +151,10 @@ CREATE TABLE Amizade (
     cd_amizade INT NOT NULL,
     amigo_1 VARCHAR(100) NOT NULL,
     amigo_2 VARCHAR(100) NOT NULL,
-    status ENUM('Pendente','Aceito') NOT NULL,
+    status ENUM('Pendente','Aceito','Negado') NOT NULL,
 
-    CONSTRAINT pk_amizade PRIMARY KEY (cd_amizade),
+    CONSTRAINT pk_amizade
+        PRIMARY KEY (cd_amizade),
 
     CONSTRAINT fk_amizade_usuario_1
         FOREIGN KEY (amigo_1)
@@ -150,15 +163,6 @@ CREATE TABLE Amizade (
     CONSTRAINT fk_amizade_usuario_2
         FOREIGN KEY (amigo_2)
         REFERENCES Usuario(email)
-);
-
-
-CREATE TABLE Caderno_publicado (
-    cd_publicacao INT NOT NULL,
-    data_publicacao DATE NOT NULL,
-    qt_acessos INT NOT NULL,
-
-    CONSTRAINT pk_caderno_publicado PRIMARY KEY (cd_publicacao)
 );
 
 
@@ -171,7 +175,8 @@ CREATE TABLE Caderno_aluno (
     disciplina TINYTEXT NOT NULL,
     topico TINYTEXT NOT NULL,
 
-    CONSTRAINT pk_caderno_aluno PRIMARY KEY (cd_caderno),
+    CONSTRAINT pk_caderno_aluno
+        PRIMARY KEY (cd_caderno, usuario_email),
 
     CONSTRAINT fk_caderno_aluno_usuario
         FOREIGN KEY (usuario_email)
@@ -179,11 +184,23 @@ CREATE TABLE Caderno_aluno (
 
     CONSTRAINT fk_caderno_aluno_guia
         FOREIGN KEY (cd_guia)
-        REFERENCES Guia(cd_guia),
+        REFERENCES Guia(cd_guia)
+);
 
-    CONSTRAINT fk_caderno_aluno_publicacao
-        FOREIGN KEY (cd_publicacao)
-        REFERENCES Caderno_publicado(cd_publicacao)
+
+CREATE TABLE Caderno_publicado (
+    cd_publicacao INT NOT NULL,
+    cd_caderno INT NOT NULL,
+    usuario_email VARCHAR(100) NOT NULL,
+    data_publicacao DATE NOT NULL,
+    qt_acessos INT NOT NULL,
+
+    CONSTRAINT pk_caderno_publicado
+        PRIMARY KEY (cd_publicacao, cd_caderno, usuario_email),
+
+    CONSTRAINT fk_caderno_publicado_caderno
+        FOREIGN KEY (cd_caderno, usuario_email)
+        REFERENCES Caderno_aluno(cd_caderno, usuario_email)
 );
 
 
@@ -198,7 +215,8 @@ CREATE TABLE Sessao (
     codigo_entrada CHAR(9),
     texto_caderno LONGTEXT,
 
-    CONSTRAINT pk_sessao PRIMARY KEY (cd_sessao),
+    CONSTRAINT pk_sessao
+        PRIMARY KEY (cd_sessao),
 
     CONSTRAINT fk_sessao_criador
         FOREIGN KEY (criador_email)
@@ -235,7 +253,8 @@ CREATE TABLE Mensagem (
     texto MEDIUMTEXT,
     midia BLOB,
 
-    CONSTRAINT pk_mensagem PRIMARY KEY (cd_mensagem),
+    CONSTRAINT pk_mensagem
+        PRIMARY KEY (cd_mensagem, cd_sessao),
 
     CONSTRAINT fk_mensagem_participante
         FOREIGN KEY (cd_sessao, participante_email)
