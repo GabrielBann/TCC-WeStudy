@@ -5,7 +5,16 @@
     color: var(--texto-claro);
     border: none;
     transition: 0.5s;
-    font-weight: 300;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 40px;
+
+    path {
+        stroke: var(--texto-claro);
+    }
 }
 
 .button:hover {
@@ -21,16 +30,25 @@
 
 .button:global(.outlined) {
     background-color: transparent;
-    border: 2px solid black;
-    color: black;
+    border: 2px solid var(--texto-escuro);
+    color: var(--texto-escuro);
     font-weight: bold;
     transition: 0.2s;
+
+    path {
+        stroke: var(--texto-escuro);
+    }
 }
 
 .button:global(.outlined):hover{
     border: 2px solid var(--cor-principal);
     color: var(--cor-principal);
     outline: none;
+
+    path {
+        transition: 0.2s;
+        stroke: var(--cor-principal);
+    }
 }
 
 

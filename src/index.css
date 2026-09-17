@@ -29,6 +29,8 @@
 
     /* TOKENS */
 
+    --cor-principal: var(--primaria-2);
+
     --texto-claro: var(--claro-1);
     --texto-escuro: var(--preto);
 
