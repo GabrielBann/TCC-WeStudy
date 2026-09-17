@@ -1,14 +1,10 @@
-import "./index.css"
-import Logo from '../../assets/Logotipo WeStudy.png'
+import css from './index.module.css';
 
 export default function Tela() {
 
-    return(
+    return (
         <>
-        <header>
-            <img src={Logo} alt="" />
-        </header>
-        <h1>oi</h1>
+        
         </>
-    );
+    )
 }
