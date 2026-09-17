@@ -1,0 +1,37 @@
+.button {
+    padding: 8px 12px;
+    background-color: var(--cor-principal);
+    border-radius: 16px;
+    color: var(--texto-claro);
+    border: none;
+    transition: 0.5s;
+    font-weight: 300;
+}
+
+.button:hover {
+    cursor: pointer;
+    outline: 3px solid var(--primaria-4);
+    background-color: var(--primaria-1);
+}
+
+.button:active {
+    transition: 0.05s;
+    scale: 0.95;     
+}
+
+.button:global(.outlined) {
+    background-color: transparent;
+    border: 2px solid black;
+    color: black;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.button:global(.outlined):hover{
+    border: 2px solid var(--cor-principal);
+    color: var(--cor-principal);
+    outline: none;
+}
+
+
+

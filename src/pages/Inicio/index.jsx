@@ -1,15 +1,18 @@
 
 import Logotipo from "../../assets/Logotipo WeStudy.png";
-import './index.module.css';
+import css from './index.module.css';
 
-document.title = 'WeStudy'
+import Botao from '../../components/Botao'
+
+document.title = 'WeStudy';
 
 export default function Tela() {
     
     return (
         <>
-            <header>
+            <header className={css.header}>
                 <img src={Logotipo} alt="Logotipo da marca WeStudy" />
+                <Botao className='outlined'>Botão</Botao>
             </header>
         </>
     );
