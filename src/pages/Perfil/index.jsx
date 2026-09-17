@@ -12,7 +12,7 @@ import FlechaBaixo from "../../assets/Icones/Flecha Baixo.svg";
 import GuiaIcon from "../../assets/Icones/Papel.svg";
 import SairIcon from "../../assets/Icones/Sair.svg";
 import MarcadorIcon from "../../assets/Icones/Marcador.svg";
-import MenuLateral from "../MenuLateral";
+import MenuLateral from "../../components/MenuLateral";
 import Logotipo from "../../assets/Logotipo WeStudy.png";
 import GrupoIcon from "../../assets/Icones/Grupo.svg";
 import NoficacoesIcon from "../../assets/Icones/Notificação.svg";
